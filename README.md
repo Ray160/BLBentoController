@@ -6,6 +6,11 @@ The BL Bento Box Controller is an ESP8266 based device that connects to your Bam
 
 - Connects to Bambulab X1, X1C, P1P, or P1S
 - Controls relay for use with Bento Box filter based on printer state
+    - Bento Box is enabled during:
+      - Bed heating: Distribute bed heat for increasing chamber temps for ABS
+      - Nozzle heating and wiping: Generates high particulates during purging
+      - Printing
+      - After prints or cancellations/failures, the Bento Box will continue to run for 5 minutes to filter the remaining air
   
 ### Components
 
