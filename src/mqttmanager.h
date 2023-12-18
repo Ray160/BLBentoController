@@ -8,7 +8,7 @@
     static int mqttdocument = 16384;
 #elif defined(ESP8266)
     #include <ESP8266WiFi.h>
-    static int mqttbuffer = 9831;
+    static int mqttbuffer = 8192;
     static int mqttdocument = 8192;
 #endif
 #include <WiFiClientSecure.h>
@@ -77,11 +77,11 @@ void connectMqtt(){
 void ParseCallback(JsonDocument &messageobject){
 
     if (printerConfig.debuging){
-        Serial.println("Mqtt message received,");
-        Serial.println("FreeHeap: ");
+        Serial.println(F("Mqtt message received,"));
+        Serial.println(F("FreeHeap: "));
         Serial.print(ESP.getFreeHeap());
         //serializeJson(messageobject, Serial);
-        Serial.println("");
+        Serial.println();
     }
 
     bool Changed = false;

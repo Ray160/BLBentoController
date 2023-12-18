@@ -15,12 +15,14 @@
 #endif
 
 unsigned long previousMillis = 0; 
-const long offDelay = 300000; 
+const long offDelay = 600000; 
 bool relayTimer = false;
 
 void offRelay(){
-    previousMillis = millis();
-    relayTimer = true;
+    if(!relayTimer){
+        previousMillis = millis();
+        relayTimer = true;
+    }
 }
 
 void updateRelay(){
@@ -37,6 +39,7 @@ void updateRelay(){
 
     if (printerVariables.online == false){ //printer offline
         digitalWrite(relayPin, LOW); //OFF
+        relayTimer = false;
         if (printerConfig.debuging){
             Serial.println(F("Printer offline, Turning relay off"));
         };
@@ -47,14 +50,6 @@ void updateRelay(){
         digitalWrite(relayPin, HIGH); //ON
         if (printerConfig.debuging){
             Serial.println(F("Cleaning nozzle, Turning relay on"));
-        };
-        return;
-    }
-
-    if (printerVariables.stage == 9){ //Scaning surface
-        digitalWrite(relayPin, HIGH); //ON
-        if (printerConfig.debuging){
-            Serial.println(F("Scanning Surface, Turning relay on"));
         };
         return;
     }
@@ -111,15 +106,10 @@ void updateRelay(){
         }
     };
 
-    //GREEN
-
-    if ((millis() - printerVariables.finishstartms) <= 300000 && printerVariables.gcodeState == "FINISH"){
+    if (printerVariables.gcodeState == "FINISH"){
         offRelay();
         if (printerConfig.debuging){
-            Serial.println(F("Finished print, Turning Leds green"));
-            Serial.println(F("Leds should stay on for: "));
-            Serial.print((millis() - printerVariables.finishstartms));
-            Serial.print(F(" MS"));
+            Serial.println(F("Print finished, Turning relay off"));
         };
         return;
     }
@@ -135,7 +125,8 @@ void updateRelay(){
     }
 
     if (printerVariables.stage == -1){ // Idle
-        offRelay();
+        digitalWrite(relayPin, LOW); //OFF
+        relayTimer = false;
         if (printerConfig.debuging){
             Serial.println(F("Idle, Turning relay off"));
         };
@@ -143,7 +134,8 @@ void updateRelay(){
     }
 
     if (printerVariables.stage == -2){ //Offline
-        offRelay();
+        digitalWrite(relayPin, LOW); //OFF
+        relayTimer = false;
         if (printerConfig.debuging){
             Serial.println(F("Stage -2, Turning relay off"));
         };
@@ -157,10 +149,7 @@ void setupRelay() {
 }
 
 void relayloop(){
-    if((millis() - printerVariables.finishstartms) >= 300000 && printerVariables.gcodeState == "FINISH"){
-        printerVariables.gcodeState == "IDLE";
-        updateRelay();
-    }
+    updateRelay();
     if (millis() - previousMillis >= offDelay && relayTimer) {
         digitalWrite(relayPin, LOW); //OFF
         relayTimer = false;
