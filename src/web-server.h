@@ -62,7 +62,7 @@ void submitSetup(){
         printerConfig.brightness = webServer.arg("brightnessslider").toInt();
 
         saveFileSystem();
-        updateleds();
+        updateRelay();
         handleSetup();
 
     }
