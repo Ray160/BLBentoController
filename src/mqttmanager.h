@@ -88,6 +88,10 @@ void ParseCallback(JsonDocument &messageobject){
     if (messageobject["print"].containsKey("stg_cur")){
         printerVariables.stage = messageobject["print"]["stg_cur"];
         Changed = true;
+    }else{
+        if (printerConfig.debuging){
+            Serial.println(F("stg_cur not in message"));
+        }
     }
 
     if (messageobject["print"].containsKey("gcode_state")){
@@ -103,10 +107,18 @@ void ParseCallback(JsonDocument &messageobject){
         Changed = true;
     }
 
-    if (messageobject["print"].containsKey("lights_report")){
-        if (messageobject["print"]["lights_report"][0]["node"] == "chamber_light"){
-            printerVariables.ledstate = messageobject["print"]["lights_report"][0]["mode"] == "on";
-            Changed = true;
+     if (messageobject["print"].containsKey("lights_report")) {
+        JsonArray lightsReport = messageobject["print"]["lights_report"];
+
+        for (JsonObject light : lightsReport) {
+            if (light["node"] == "chamber_light") {
+                printerVariables.ledstate = light["mode"] == "on";
+                Changed = true;
+            }
+        }
+    }else{
+        if (printerConfig.debuging){
+            Serial.println(F("lights_report not in message"));
         }
     }
 
